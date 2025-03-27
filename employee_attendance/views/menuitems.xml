@@ -1,0 +1,7 @@
+<odoo>
+    <menuitem id="employee_attendance_menu_root" name="Employee Attendance">
+        <menuitem id="employee_attendance_topbar_menu" name="Menu">
+            <menuitem id="employee_attendance_menu_action" action="employee_attendance_attendance_action" />
+        </menuitem>
+    </menuitem>
+</odoo>
