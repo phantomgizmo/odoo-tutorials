@@ -1,6 +1,6 @@
 from odoo import models, fields, api
 
-from pytz import timezone
+from pytz import timezone, UTC
 
 import datetime
 import logging
@@ -20,7 +20,9 @@ class EmployeeAttendance(models.Model):
         hour = float(hour_str) + (float(minute_str) / 60) + (float(second_str) / 60 / 60)
 
         return hour
-
+    
+    def _get_tz(self):
+        return timezone("Asia/Jakarta")
 
     def check_in_action(self):
         for attendance in self:
@@ -35,18 +37,14 @@ class EmployeeAttendance(models.Model):
                 "check_out": datetime.datetime.now()
             })
 
+    @api.model
     def automatic_check_out(self):
-        for attendance in self:
+        attendances = self.search([("check_out", "=", False)])
+        for attendance in attendances:
             attendance.write({
-                "check_out": 23.59
+                "check_out": fields.Datetime.now().astimezone(self._get_tz()).replace(hour=23, minute=59, second=0).astimezone(UTC).replace(tzinfo=None)
             })
-    def test_cron(self):
-        _logger.info("TEST CRON")
 
-    def _get_user_tz(self):
-        user_tz = self.env.user.tz or 'UTC'
-        user_tz = timezone(user_tz)
-        return user_tz
 
     check_in_status = fields.Boolean(string="Check in status")
     shift_id = fields.Many2one('hr.shift', string='Shift', required=True, ondelete='cascade', index=True)
@@ -56,7 +54,7 @@ class EmployeeAttendance(models.Model):
 
     @api.depends('check_in', 'shift_id.start_time', 'shift_id.grace_period')
     def _compute_late_minutes(self):
-        user_tz = self._get_user_tz()
+        user_tz = self._get_tz()
         for attendance in self:
             # set default late_minutes
             attendance.late_minutes = 0
