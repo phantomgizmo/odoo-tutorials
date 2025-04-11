@@ -4,119 +4,40 @@
         <field name="model">employee.attendance</field>
         <field name="arch" type="xml">
             <form string="Employee attendances" duplicate="false">
-                <header>
-                    <field name="overtime_status" widget="statusbar" invisible="no_validated_overtime_hours" readonly="0" options="{'clickable': '1'}"/>
-                    <field name="overtime_status" widget="statusbar" invisible="not no_validated_overtime_hours" statusbar_visible="approved,refused" readonly="0" options="{'clickable': '1'}"/>
-                </header>
                 <sheet>
                     <group>
-                        <group colspan="2">
-                            <group col="1">
-                                <field name="employee_id" widget="many2one_avatar_user"/>
-                                <field name="check_in" options="{'rounding': 0}"/>
-                                <field name="check_out" options="{'rounding': 0}" placeholder="Currently Working"/>
-                            </group>
-                            <group col="2">
-                                <field name="worked_hours" string="Worked Time" widget="float_time"/>
-                                <field name="overtime_hours" widget="float_time" string="Worked Extra Hours" invisible="overtime_hours == validated_overtime_hours"/>
-                                <label for="validated_overtime_hours"/>
-                                <div class="o_row">
-                                <field
-                                    name="validated_overtime_hours"
-                                    class="o_hr_narrow_field-4"
-                                    widget="float_time"
-                                    string="Extra Hours"
-                                    readonly="overtime_status == 'refused'"
-                                    />
-                                    <button class="oe_stat_button" string="Approve" invisible="overtime_status not in ['to_approve', 'refused'] or no_validated_overtime_hours" name="action_approve_overtime" icon="fa-check" type="object"/>
-                                    <button class="oe_stat_button" string="Refuse" invisible="overtime_status not in ['to_approve', 'approved'] or no_validated_overtime_hours" name="action_refuse_overtime" icon="fa-times" type="object"/>
-                                </div>
-                            </group>
-                        </group>
-                        <separator string="Check In"/>
-                        <group name="check_in_group" colspan="2">
-                            <group>
-                                <group>
-                                    <field name="in_mode"/>
-                                    <field name="in_ip_address" invisible="in_mode == 'manual'"/>
-                                    <field name="in_browser" invisible="in_mode == 'manual'"/>
-                                </group>
-                            </group>
-                            <group invisible="in_mode == 'manual'">
-                                <label for="in_country_name" string="Localisation"/>
-                                <div class="o_row" name="in_location_info">
-                                    <span>
-                                        <field name="in_country_name"/>
-                                    </span>
-                                    <span>
-                                        <field name="in_city" invisible="in_city == 'Unknown'" nolabel="1"/>
-                                    </span>
-                                </div>
-
-                                <label for="in_latitude" string="GPS Coordinates"/>
-                                <div>
-                                    <div class="o_row">
-                                        <span>
-                                            <field name="in_latitude"/>
-                                        </span>,
-                                        <span>
-                                            <field name="in_longitude" nolabel="1"/>
-                                        </span>
-                                    </div>
-                                    <button
-                                        name="action_in_attendance_maps"
-                                        type="object"
-                                        class="btn btn-link ps-0 pt-0 pb-2"
-                                        icon="oi-arrow-right"
-                                        string="View on Maps"
-                                        colspan="2"/>
-                                </div>
-                            </group>
-                        </group>
-                        <separator string="Check Out" name="check_out_separator" invisible="not check_out"/>
-                        <group colspan="2" name="check_out_group" invisible="not check_out">
-                            <group>
-                                <group>
-                                    <field name="out_mode" string="Mode"/>
-                                    <field name="out_ip_address" string="IP Address" invisible="in_mode == 'manual'"/>
-                                    <field name="out_browser" string="Browser" invisible="in_mode == 'manual'"/>
-                                </group>
-                            </group>
-                            <group invisible="out_mode == 'manual'">
-                                <label for="out_country_name" string="Localisation"/>
-                                <div class="o_row" name="out_location_info" >
-                                    <span>
-                                        <field name="out_country_name"/>
-                                    </span>
-                                    <span>
-                                        <field name="out_city" invisible="out_city == 'Unknown'" nolabel="1"/>
-                                    </span>
-                                </div>
-
-                                <label for="out_latitude" string="GPS Coordinates"/>
-                                <div>
-                                    <div class="o_row">
-                                        <span>
-                                            <field name="out_latitude"/>
-                                        </span>,
-                                        <span>
-                                            <field name="out_longitude" nolabel="1"/>
-                                        </span>
-                                    </div>
-                                    <button
-                                        name="action_out_attendance_maps"
-                                        type="object"
-                                        class="btn btn-link ps-0 pt-0 pb-2"
-                                        icon="oi-arrow-right"
-                                        string="View on Maps"
-                                        colspan="2"/>
-                                </div>
-                            </group>
-                        </group>
+                        <field name="employee_id" widget="many2one_avatar_user"/>
+                        <field name="shift_id" />
+                        <button name="check_in_action" type="object" class="btn-primary" invisible="check_in_status">Check in</button>
+                        <button name="check_out_action" type="object" class="btn-primary" invisible="check_out or not check_in_status">Check out</button>
                     </group>
                 </sheet>
-                <chatter/>
             </form>
+        </field>
+    </record>
+
+    <record id="view_attendance_tree" model="ir.ui.view">
+        <field name="name">Attendance Tree</field>
+        <field name="model">employee.attendance</field>
+        <field name="arch" type="xml">
+            <list js_class="attendance_list_view">
+                <field name="employee_id"/>
+                <field name="check_in" width="200"/>
+                <field name="check_out" width="200"/>
+                <field name="shift_id" width="200"/>
+                <field name="late_minutes" width="200"/>
+                <field name="overtime_hours" width="200"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="employee_attendance_view_filter" model="ir.ui.view">
+        <field name="name">employee_attendance_view_filter</field>
+        <field name="model">employee.attendance</field>
+        <field name="arch" type="xml">
+            <search string="Employee Attendance Search">
+                <filter string="Date" name="groupby_name" context="{'group_by': 'check_in:month'}"/>
+            </search>
         </field>
     </record>
 
@@ -124,5 +45,7 @@
         <field name="name">Attendance</field>
         <field name="res_model">employee.attendance</field>
         <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_attendance_tree" />
+        <field name="search_view_id" ref="employee_attendance_view_filter" />
     </record>
 </odoo>

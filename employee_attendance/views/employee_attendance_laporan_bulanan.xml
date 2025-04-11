@@ -1,0 +1,43 @@
+<odoo>
+    <record id="view_laporan_bulanan_tree" model="ir.ui.view">
+        <field name="name">Attendance Tree</field>
+        <field name="model">employee.attendance</field>
+        <field name="arch" type="xml">
+            <list js_class="attendance_list_view">
+                <field name="employee_id" width="200"/>
+                <field name="worked_hours" />
+                <field name="late_minutes"/>
+                <field name="overtime_hours" />
+            </list>
+        </field>
+    </record>
+
+    <record id="employee_attendance_view_filter" model="ir.ui.view">
+        <field name="name">employee_attendance_view_filter</field>
+        <field name="model">employee.attendance</field>
+        <field name="arch" type="xml">
+            <search string="Employee Attendance Search">
+                <filter string="Date" name="check_in_filter" date="check_in"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Date" name="groupby_name" context="{'group_by': 'check_in:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="laporan_bulanan" model="ir.actions.act_window">
+        <field name="name">Attendance</field>
+        <field name="res_model">employee.attendance</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_laporan_bulanan_tree" />
+        <field name="search_view_id" ref="employee_attendance_view_filter" />
+        <field name="context">
+        {
+            "create": False,
+            "search_default_groupby_name": 1,
+            "search_default_employee": 2
+        }
+        </field>
+    </record>
+</odoo>

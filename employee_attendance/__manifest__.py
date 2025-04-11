@@ -5,11 +5,17 @@
     'installable': True,
     'application': True,
     'data': [
+        'data/automatic_check_out_cron.xml',
+
         'security/ir.model.access.csv',
 
         'views/employee_attendance_attendance.xml',
+        'views/employee_attendance_shift.xml',
+        'views/employee_attendance_dashboard.xml',
+        'views/employee_attendance_laporan_bulanan.xml',
         'views/menuitems.xml',
-    ]
+    ],
+    'post_init_hook': '_set_cron_nextcall'
 }
 
 # {

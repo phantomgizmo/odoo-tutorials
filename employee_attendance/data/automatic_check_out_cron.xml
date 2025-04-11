@@ -1,0 +1,11 @@
+<odoo>
+    <record id="automatic_check_out_cron" model="ir.cron">
+        <field name="name">Run at 23.59</field>
+        <field name="model_id" ref="model_employee_attendance"/>
+        <field name="state">code</field>
+        <field name="code">model.automatic_check_out()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

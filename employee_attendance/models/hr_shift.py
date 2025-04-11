@@ -3,6 +3,7 @@ from odoo import models, fields, api
 class HrShift(models.Model):
     _name = 'hr.shift'
 
+    attendance_ids = fields.One2many("employee.attendance", "shift_id")
     name = fields.Char()
     start_time = fields.Float(string='Start from', required=True, index=True,
         help="Start and End time of working.\n"
